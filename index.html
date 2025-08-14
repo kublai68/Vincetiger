@@ -1,50 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Vince Tiger Image with Sound</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moving, Roaring Tiger</title>
   <style>
-    body {
-      text-align: center;
-      background-color: #f0f0f0;
-      font-family: Arial, sans-serif;
+    :root {
+      --sky: #bfe9ff;
+      --horizon: #e3f6ff;
+      --grass: #c8f7a1;
+      --sun: #ffd166;
+      --shadow: rgba(0,0,0,.20);
     }
-    img {
-      max-width: 150%;
-      height: auto;
-      margin-top: 20px;
-      border: 5px solid #ffa500;
-      border-radius: 10px;
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, var(--sky), var(--horizon) 60%, var(--grass) 60%);
+      overflow: hidden;
+      display: grid;
+      place-items: stretch;
+    }
+
+    .scene {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      isolation: isolate;
+    }
+
+    /* Sun */
+    .sun {
+      position: absolute;
+      top: 5vmin;
+      right: 8vmin;
+      width: 10vmin;
+      height: 10vmin;
+      background: var(--sun);
+      border-radius: 50%;
+      box-shadow: 0 0 50px 10px var(--sun);
+      filter: blur(.2px);
+      z-index: 0;
+    }
+
+    /* Ground stripes for a sense of speed */
+    .ground-lines {
+      position: absolute; inset: 60% 0 0 0; overflow: hidden;
+    }
+    .ground-lines::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,.05) 0 30px,
+        rgba(255,255,255,.15) 30px 60px
+      );
+      height: 100%;
+      width: 200%;
+      animation: slideLines 6s linear infinite;
+      transform: translateX(0);
+    }
+    @keyframes slideLines {
+      to { transform: translateX(-50%); }
+    }
+
+    /* Tiger */
+    .tiger {
+      position: absolute;
+      left: -20vmin; /* start off-screen */
+      bottom: 16vmin;
+      font-size: clamp(72px, 14vmin, 180px);
+      line-height: 1;
+      user-select: none;
+      cursor: pointer;
+      z-index: 2;
+      display: inline-grid;
+      place-items: center;
+      transform-origin: 50% 80%;
+      animation: walkAcross 10s ease-in-out infinite alternate,
+                 bounce 700ms ease-in-out infinite;
+    }
+
+    .tiger .emoji { filter: drop-shadow(0 10px 8px var(--shadow)); }
+
+    @keyframes walkAcross {
+      0%   { transform: translateX(0) scale(1); }
+      100% { transform: translateX(calc(100vw + 30vmin)) scale(1); }
+    }
+    @keyframes bounce {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 1.2vmin; }
+    }
+
+    /* Shadow ellipse */
+    .shadow {
+      position: absolute;
+      inset: auto 0 14vmin 0;
+      height: 3.2vmin;
+      width: 18vmin;
+      margin: 0 auto;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.25), transparent 60%);
+      filter: blur(3px);
+      z-index: 1;
+      animation: shadowScale 10s ease-in-out infinite alternate;
+    }
+    @keyframes shadowScale {
+      0%   { transform: translateX(-42vw) scaleX(.9); }
+      100% { transform: translateX(42vw)  scaleX(.9); }
+    }
+
+    /* ROAR text effect */
+    .roar {
+      position: absolute;
+      bottom: calc(16vmin + 10vmin);
+      left: 50%;
+      translate: -50% 0;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-shadow: 0 2px 0 #fff, 0 8px 18px rgba(0,0,0,.35);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3;
+      white-space: nowrap;
+    }
+    .roar .text {
+      display: inline-block;
+      padding: .2em .5em;
+      border-radius: .3em;
+      background: #ffecd1;
+      border: 3px solid #ffb703;
+      transform: scale(.6) rotate(-4deg);
+    }
+    .tiger.roaring ~ .roar { /* when tiger has .roaring */
+      animation: shout 700ms ease-out forwards;
+    }
+    @keyframes shout {
+      0% { opacity: 0; transform: translate(-50%, 10px) scale(.8); }
+      25% { opacity: 1; transform: translate(-50%, -2px) scale(1.1); }
+      100% { opacity: 0; transform: translate(-50%, -30px) scale(1.0); }
+    }
+
+    /* UI */
+    .controls {
+      position: absolute;
+      inset: 12px 12px auto auto;
+      display: flex;
+      gap: 8px;
+      z-index: 5;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #ff7f50;
-      color: white;
-      border: none;
-      border-radius: 5px;
+      appearance: none;
+      border: 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.25);
       cursor: pointer;
     }
-    button:hover {
-      background-color: #e55300;
+    button:active { transform: translateY(1px); }
+
+    .hint {
+      position: absolute; inset: auto 0 8px 0; text-align: center; font-size: 14px; color: #111;
+      opacity: .7; z-index: 4;
     }
   </style>
 </head>
 <body>
+  <div class="scene" aria-label="Animated tiger scene">
+    <div class="sun" aria-hidden="true"></div>
 
-  <h1>Vince The Tiger</h1>
+    <div class="controls">
+      <button id="roarBtn" title="Make the tiger roar (Space)">Roar! (Space)</button>
+      <button id="speedBtn" title="Toggle speed">Toggle Speed</button>
+    </div>
 
-  <!-- Tiger Image from online source -->
-  <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Tiger.50.jpg" alt="Tiger">
+    <!-- The tiger -->
+    <div class="tiger" role="img" aria-label="Tiger" id="tiger">
+      <div class="emoji">🐯</div>
+    </div>
+    <div class="shadow" aria-hidden="true"></div>
 
-  <!-- Audio file -->
-  <audio id="tigerSound" src="tiger-roar.mp3"></audio>
+    <!-- Roar text bubble -->
+    <div class="roar" aria-hidden="true"><span class="text">ROAR!</span></div>
 
-  <!-- Button to play sound -->
-  <button onclick="document.getElementById('tigerSound').play();">
-    Hear Vinnie Roar!
-  </button>
+    <div class="ground-lines" aria-hidden="true"></div>
 
+    <p class="hint">Click the tiger or press Space to roar • Works offline (no audio files needed)</p>
+  </div>
+
+  <script>
+    // --- Simple WebAudio "roar" synthesizer (no external files) ---
+    let audioCtx;
+    function playRoar() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      const duration = 1.6; // seconds
+      const now = audioCtx.currentTime;
+
+      const out = audioCtx.createGain();
+      out.gain.setValueAtTime(0.0001, now);
+      out.gain.exponentialRampToValueAtTime(0.9, now + 0.05);
+      out.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      out.connect(audioCtx.destination);
+
+      // 1) Brown-ish noise for breathy growl
+      const noiseBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * duration, audioCtx.sampleRate);
+      const data = noiseBuf.getChannelData(0);
+      let lastOut = 0.0;
+      for (let i = 0; i < data.length; i++) {
+        const white = Math.random() * 2 - 1;
+        data[i] = (lastOut + (0.02 * white)) / 1.02; // Brown noise
+        lastOut = data[i];
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuf;
+      const band = audioCtx.createBiquadFilter();
+      band.type = "bandpass";
+      band.frequency.setValueAtTime(250, now);
+      band.Q.setValueAtTime(0.6, now);
+      noise.connect(band);
+
+      // 2) Low oscillator sweeping down like a rumble
+      const osc = audioCtx.createOscillator();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.9);
+
+      // 3) Distortion / waveshaper for grit
+      function makeDistortionCurve(amount = 120) {
+        const n_samples = 44100;
+        const curve = new Float32Array(n_samples);
+        const deg = Math.PI / 180;
+        let x;
+        for (let i = 0; i < n_samples; ++i) {
+          x = (i * 2) / n_samples - 1;
+          curve[i] = (3 + amount) * x * 20 * deg / (Math.PI + amount * Math.abs(x));
+        }
+        return curve;
+      }
+      const shaper = audioCtx.createWaveShaper();
+      shaper.curve = makeDistortionCurve(200);
+
+      // 4) Low-pass to tame highs, add slight pitch LFO
+      const lp = audioCtx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(1200, now);
+
+      const lfo = audioCtx.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.value = 9; // vibrato/grit
+      const lfoGain = audioCtx.createGain();
+      lfoGain.gain.value = 6; // depth in Hz
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+
+      // Mix & route
+      const mix = audioCtx.createGain();
+      mix.gain.value = 0.9;
+      band.connect(mix);
+      osc.connect(shaper);
+      shaper.connect(mix);
+      mix.connect(lp).connect(out);
+
+      // Start & stop
+      noise.start(now);
+      noise.stop(now + duration);
+      osc.start(now);
+      osc.stop(now + duration);
+      lfo.start(now);
+      lfo.stop(now + duration);
+    }
+
+    // --- UI & animation hooks ---
+    const tiger = document.getElementById('tiger');
+    const roarBtn = document.getElementById('roarBtn');
+    const speedBtn = document.getElementById('speedBtn');
+
+    function triggerRoar() {
+      // visual pop
+      tiger.classList.add('roaring');
+      setTimeout(() => tiger.classList.remove('roaring'), 550);
+      // audio
+      try { playRoar(); } catch (e) { /* ignore autoplay blocks */ }
+    }
+
+    tiger.addEventListener('click', triggerRoar);
+    roarBtn.addEventListener('click', triggerRoar);
+
+    // Keyboard accessibility
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); triggerRoar(); }
+    });
+
+    // Speed toggle
+    let fast = false;
+    speedBtn.addEventListener('click', () => {
+      fast = !fast;
+      const dur = fast ? '6s' : '10s';
+      tiger.style.animationDuration = `${dur}, 700ms`;
+    });
+
+    // Auto-roar now & then so it feels alive
+    setInterval(() => {
+      // 50% chance to roar each interval
+      if (Math.random() < 0.5) triggerRoar();
+    }, 5000);
+  </script>
 </body>
 </html>
