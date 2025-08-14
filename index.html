@@ -1,70 +1,82 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moving and Roaring Tiger</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #228B22;
-            overflow: hidden;
-        }
-        .tiger-container {
-            position: relative;
-            width: 300px;
-            height: 200px;
-        }
-        .tiger {
-            width: 100%;
-            height: 100%;
-            background: url('https://raw.githubusercontent.com/xai-org/grok-artifacts/main/tiger.png') no-repeat center;
-            background-size: contain;
-            animation: moveTiger 5s linear infinite;
-        }
-        @keyframes moveTiger {
-            0% { transform: translateX(-100vw); }
-            100% { transform: translateX(100vw); }
-        }
-        .roar {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            opacity: 0;
-            animation: showRoar 5s infinite;
-        }
-        @keyframes showRoar {
-            0%, 20% { opacity: 0; }
-            25%, 35% { opacity: 1; }
-            40%, 100% { opacity: 0; }
-        }
-        audio {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Tiger with Sound</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    video {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .overlay {
+      position: relative;
+      z-index: 1;
+      color: white;
+      text-shadow: 0 0 10px black;
+      padding: 20px;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  </style>
 </head>
 <body>
-    <div class="tiger-container">
-        <div class="tiger"></div>
-        <div class="roar">ROAR!</div>
-    </div>
-    <audio id="tiger-roar" autoplay loop>
-        <source src="tiger-roar.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-    <script>
-        const audio = document.getElementById('tiger-roar');
-        audio.volume = 0.5; // Adjust volume as needed
-    </script>
+
+  <!-- Waterfall Background Video -->
+  <video id="bg-video" autoplay muted loop playsinline>
+    <source src="tiger.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
+  <!-- Audio Element (Waterfall Sound) -->
+  <audio id="tiger sound" loop>
+    <source src="tiger-roar.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Overlay Content -->
+  <div class="overlay">
+    <h1>Vinnie Look in the Mirror</h1>
+    <p>Vinnie Tiger</p>
+    <button onclick="startSound()">Enable Sound</button>
+  </div>
+
+  <!-- Script to Play Audio After User Interaction -->
+  <script>
+    function startSound() {
+      const audio = document.getElementById("waterfall-sound");
+      audio.play().catch(err => {
+        console.error("Audio playback failed:", err);
+      });
+    }
+  </script>
+
 </body>
 </html>
