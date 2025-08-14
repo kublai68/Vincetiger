@@ -56,7 +56,7 @@
   </video>
 
   <!-- Audio Element (Waterfall Sound) -->
-  <audio id="tiger sound" loop>
+  <audio id="tiger-sound" loop>
     <source src="tiger-roar.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
@@ -71,7 +71,7 @@
   <!-- Script to Play Audio After User Interaction -->
   <script>
     function startSound() {
-      const audio = document.getElementById("waterfall-sound");
+      const audio = document.getElementById("tiger-sound");
       audio.play().catch(err => {
         console.error("Audio playback failed:", err);
       });
